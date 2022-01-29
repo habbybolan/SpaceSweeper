@@ -12,16 +12,17 @@
         
         <!-- Header for each minesweeper screen-->
         <Header>
-            test
+            Header
         </Header>
         
         <!-- main menu screen Page --> 
         <main id="main-menu-page">
 
-            <!-- Sidebar high scores -->
+            <!-- high scores with sidebar -->
             <div id="left-section-container">
                 <div id="high-score-text">Highscores</div>
                 <ol id="high-score-list">
+                    <!-- *** Temp input -->
                     <li>10000</li>
                     <li>10000</li>
                     <li>10000</li>
@@ -39,14 +40,15 @@
 
             <!-- Play button -->
             <div id="middle-section-container">
-                <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 300px">
+                <!-- Holds Minesweeper title, play button and difficulty selector -->
+                <div id="middle-content-container">
+
                     <div id="minesweeper-title-text">MineSweeper</div>
 
-                    <!-- Button for startng a new game -->
-                    <!-- <a> temporary -->
+                    <!-- *** <a> temporary -->
                     <a href="#main-game-page"><button id="play-button">Play!</button></a>
                     
-
+                    <!-- Difficulty selector -->
                     <select id="difficulty-selection">
                         <option>Easy</option>
                         <option>Medium</option>
@@ -65,9 +67,9 @@
         <!-- Main Game Page -->
         <main id="main-game-page">
 
-            <!-- Container for game buttons -->
+            <!-- Container for game buttons and info -->
            <div id="game-bar-container">
-               <!-- <a> temporary -->
+               <!-- *** <a> temporary -->
                 <a href="#main-menu-page"><button id="menu-button">Menu</button></a>
                 <div id="time-text">10:00</div>
                 <img id="image-status" src="./images/smiley.png" alt="test"></img>
@@ -77,6 +79,7 @@
 
             <!-- container for main game -->
             <div id="main-game-container">
+                <!-- *** temp Minesweeper table, later created in js -->
                 <table id="mine-table">
                     <tr id="row-0"> <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> </tr>
                     <tr id="row-1"> <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> </tr>
@@ -95,18 +98,20 @@
         
         <!-- Win/Lose Page -->
         <main id="win-lose-page">
+            <!-- Section floating over game page, displaying win/lose text and nav buttons  -->
             <div id="floating-middle-container">
                 <div id="win-lose-text">You (Win/Lose)</div>
-                <div id="buttons-container">
+                <!-- Nav buttons -->
+                <nav id="buttons-container">
                     <a href="#main-game-page"><button id="play-again-button">Play Again</button></a>
                     <a href="#main-menu-page"><button id="main-menu-button">Main Menu</button></a>
-                </div>
+                </nav>
             </div>
         </main>
 
-        <!-- Fotter for each minesweeper screen -->
+        <!-- Footer for each minesweeper screen -->
         <footer>
-            test
+            Footer
         </footer>
     </body>
 </html>
