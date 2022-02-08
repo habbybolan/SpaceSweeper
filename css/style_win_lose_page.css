@@ -1,8 +1,5 @@
 /* Copyright (C) Nicholas Johnson 2022 */
 #win-lose-page {
-    display: flex;
-    /* *** Starts with display: none */
-    flex: var(--main-flex-grow);
     flex-direction: column;
     align-items: center;
     justify-content: center;

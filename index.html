@@ -16,7 +16,7 @@
         </Header>
         
         <!-- main menu screen Page --> 
-        <main id="main-menu-page">
+        <Section id="main-menu-page" class="hide screen">
 
             <!-- high scores with sidebar -->
             <div id="left-section-container">
@@ -38,7 +38,7 @@
                 </ol>
             </div>
 
-            <!-- Play button -->
+            <!-- Play button / Difficulty selector -->
             <div id="middle-section-container">
                 <!-- Holds Minesweeper title, play button and difficulty selector -->
                 <div id="middle-content-container">
@@ -59,45 +59,38 @@
                 
             </div>
 
-            <!-- difficulty selection -->
+            <!-- Right section-->
             <div id="right-section-container">
             </div>
-        </main>
+        </Section>
         
         <!-- Main Game Page -->
-        <main id="main-game-page">
+        <Section id="main-game-page" class="show screen">
 
             <!-- Container for game buttons and info -->
            <div id="game-bar-container">
-               <!-- *** <a> temporary -->
-                <a href="#main-menu-page"><button id="menu-button">Menu</button></a>
-                <div id="time-text">10:00</div>
-                <img id="image-status" src="./images/smiley.png" alt="test"></img>
-                <div id="score-text">2000</div>
-                <button id="new-game-button">New Game</button>
+               <!-- Button to navigate to main menu -->
+                <button id="menu-button" class="game-button game-bar-item">Menu</button>
+                <!-- Time of game so far -->
+                <div id="time-text" class="game-bar-item game-bar-text">10:00</div>
+                <!-- Status of game as image -->
+                <div id="image-status" class="game-bar-item"></div>
+                <!-- Score of the current game -->
+                <div id="score-text" class="game-bar-item game-bar-text">2000</div>
+                <!-- Button to start a new game -->
+                <button id="new-game-button" class="game-button game-bar-item">New Game</button>
            </div>
 
             <!-- container for main game -->
-            <div id="main-game-container">
-                <!-- *** temp Minesweeper table, later created in js -->
-                <table id="mine-table">
-                    <tr id="row-0"> <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> </tr>
-                    <tr id="row-1"> <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> </tr>
-                    <tr id="row-2"> <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> </tr>
-                    <tr id="row-3"> <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> </tr>
-                    <tr id="row-4"> <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> </tr>
-                    <tr id="row-5"> <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> </tr>
-                    <tr id="row-6"> <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> </tr>
-                    <tr id="row-7"> <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> </tr>
-                    <tr id="row-8"> <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> </tr>
-                    <tr id="row-9"> <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> </tr>
-                </table>
+            <div id="main-game-container" class="game-container">
+                <div id="mine-table" class="game-container">
+                </div>
                 
             </div>
-        </main>
+        </Section>
         
         <!-- Win/Lose Page -->
-        <main id="win-lose-page">
+        <Section id="win-lose-page" class="hide screen">
             <!-- Section floating over game page, displaying win/lose text and nav buttons  -->
             <div id="floating-middle-container">
                 <div id="win-lose-text">You (Win/Lose)</div>
@@ -107,11 +100,13 @@
                     <a href="#main-menu-page"><button id="main-menu-button">Main Menu</button></a>
                 </nav>
             </div>
-        </main>
+        </Section>
 
         <!-- Footer for each minesweeper screen -->
         <footer>
-            Footer
+            Copyright (C) Nicholas Johnson 2022
         </footer>
+
+        <script type="text/javascript" src="scripts/index.js"></script>
     </body>
 </html>

@@ -1,7 +1,5 @@
 /* Copyright (C) Nicholas Johnson 2022 */
 #main-menu-page {
-    display: flex;
-    flex: var(--main-flex-grow);
 }
 
 /* High Scrores */
