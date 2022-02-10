@@ -62,6 +62,7 @@
 }
 
 /* Minesweeper game */
+
 #main-game-container {
     flex: 10;
     margin-top: 10px;

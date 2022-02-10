@@ -1,13 +1,14 @@
 // Main start Minesweeper
-const COLUMN_SIZE = 10;
 
 let CellState = ["NOT_SELECTED", "FLAGGED", "SELECTED"];
 
 class Cell {
 
-    constructor() {
+    constructor(row, col, isMine = false) {
         this._state = CellState[0];
-        this._isMine = false; 
+        this._isMine = isMine; 
+        this._row = row;
+        this._col = col;
     }
 
     get state() {
@@ -21,45 +22,114 @@ class Cell {
     get isMine() {
         return this._isMine;
     }
+    set isMine(isMine) {
+        return this._isMine = isMine;
+    }
+    
+    get row() {
+        return this._row;
+    }
+    get col() {
+        return this._col;
+    }
 }
 
 class Minefield {
 
-    constructor( size = 10 ) {
+    constructor( difficulty ) {
 
-        this.size = size;
+        this.setBoardSize(difficulty)
+        
         this.field = [];
-        for (let i = 0; i < this.size; i++) {
+        for (let i = 0; i < this._numRows; i++) {
             // create each row inside the minefield
             let row = [];
-            for (let j = 0; j < this.size; j++) {
+            for (let j = 0; j < this._numCols; j++) {
 
-                row[j] = new Cell();
+                row[j] = new Cell(i, j);
             }
             this.field[i] = row;
         }
+
+        this.randomize(this.field[1][1]);
     }
 
+    /*
+    * Called from constructor to set the board size and number of mines based in difficulty 
+    * param difficulty  The difficulty of the game
+    */
+    setBoardSize(difficulty)
+    {
+        // easy difficulty
+        if (difficulty == 0) {
+            this._numRows = 10;
+            this._numCols = 10;
+            this._numMines = 10;
+        // medium difficulty 
+        } else if (difficulty == 1)
+        {
+            this._numRows = 16;
+            this._numCols = 16;
+            this._numMines = 40;
+        // hardest difficulty
+        } else {
+            this._numRows = 16;
+            this._numCols = 30;
+            this._numMines = 99;
+        }
+    }
 
     addMine( row, col ) {
         // Some way to add a a mine to the field
+        field[row][col] = new Cell(true);
     }
 
-    randomize( mineCount  = 10 ) {
-        // randomly place mineCount mines sowhere in the field
+    /*
+    * Place mines randomly, not placing it on selectedSell
+    * param selectedCell    The first cell selected by player
+    */
+    randomize(selectedCell) {
+        let tempNumMines = this.numMines;
+        while (tempNumMines > 0) {
+            let randRow = Math.floor(Math.random() * this.numRows);
+            let randCol = Math.floor(Math.random() * this.numCols);
+            // dont set first selected cell as a mine
+            if (selectedCell.row == randRow && selectedCell.col == randCol) continue;
+
+            // if already a mine, try again
+            let randCell = this.field[randRow][randCol];
+            if (randCell.isMine) continue;
+            
+            randCell.isMine = true;
+            tempNumMines--;
+        }
     }
 
     getCell( row, col ) {
         return this.field[row][col];
     }
+
+    get numRows()
+    {
+        return this._numRows;
+    }
+
+    get numCols()
+    {
+        return this._numCols;
+    }
+
+    get numMines() {
+        return this._numMines;
+    }
 }
 
 class App {
 
-    constructor() {
-        // initialize where the mines are
-        this.minefield = new Minefield(COLUMN_SIZE);
-        this.message = "Clicked the button";
+    constructor(difficulty) {
+        this.minefield = new Minefield(0);    // create minefield
+        this.numFlaggedMines = 0;                       // Number of mines currently flagged
+        this.difficulty = difficulty;                   // The difficulty of the game, regarding size of board and number of mines
 
         // Create the minefield HTML
         document.querySelector("#mine-table").innerHTML = this.createTableMarkup();
@@ -77,26 +147,32 @@ class App {
         .addEventListener("contextmenu", event => {
 
             event.preventDefault();
-            // check the minefield for a mine
-            // update the screeen
-            // update the game game status
-            // do we have a loser?
-            // do we have a winner?
             let elClicked = event.target;
             let row = 1 * elClicked.getAttribute("data-row");
             let col = 1 * elClicked.getAttribute("data-col");
             
             let cell = this.minefield.getCell( row, col );
+            // if the cell is not selected yet
             if (cell.state == CellState[0]) {
                 // add flag
                 elClicked.classList.remove("not-selected")
                 elClicked.classList.add("flag");
                 cell.state = CellState[1];
+                // if the cell is a mine, increment number of mines flagged
+                if (cell.isMine) {
+                    this.numFlaggedMines++;
+                    if (this.numFlaggedMines == this.minefield.numMines) {
+                        // TODO: End game
+                    }
+                }
+            // if the cell has a flag
             } else if (cell.state == CellState[1]) {
                 // remove flag
                 elClicked.classList.remove("flag");
                 elClicked.classList.add("not-selected");
                 cell.state = CellState[0]
+                // if cell is a mine, the decrement number of mines flagged
+                if (cell.isMine) this.numFlaggedMines--;
             }            
         });
 
@@ -116,11 +192,10 @@ class App {
     generateMarkupRows() {
 
         let markup = "";
-        for (let i = 0; i < COLUMN_SIZE; i++) {
+        for (let i = 0; i < this.minefield.numRows; i++) {
 
             markup += `<div class="mine-row game-container"> `;
-            for (let j = 0; j < COLUMN_SIZE; j++) {
-                // add a td with the column header
+            for (let j = 0; j < this.minefield.numCols; j++) {
                 markup += `<div class="cell not-selected" id="cell-${i}${j}" data-row="${i}" data-col="${j}"></div>`;
             }
             markup += `</div>`;
