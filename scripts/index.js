@@ -106,7 +106,7 @@ class Minefield {
             if (!cell.isMine) {
                 cell.state = CellState[2];
                 document.querySelector(`#cell-${row}${col}`).classList.remove("not-selected");
-                document.querySelector(`#cell-${row}${col}`).classList.remove("empty");
+                document.querySelector(`#cell-${row}${col}`).classList.add("empty");
                 document.querySelector(`#cell-${row}${col}`).innerHTML = this.numAdjacentMines(row, col);
                 // if the cell has no adjacent mines, then pop children to stack
                 if (this.numAdjacentMines(row, col) == 0) {
@@ -155,6 +155,17 @@ class Minefield {
         return numAdjacentMines;
     }
 
+    displayAllMines() {
+        for (let i = 0; i < this.numRows; i++) {
+            for (let j = 0; j < this.numCols; j++) {
+                if (this.field[i][j].isMine) {
+                    document.querySelector(`#cell-${i}${j}`).classList.remove("not-selected");
+                    document.querySelector(`#cell-${i}${j}`).classList.add("bomb");
+                }
+            }
+        }
+    }
+
     getCell( row, col ) {
         return this.field[row][col];
     }
@@ -192,66 +203,64 @@ class App {
 
     run() {}
 
+    flagEvent = (event) => {
+        event.preventDefault();
+        let elClicked = event.target;
+        let row = 1 * elClicked.getAttribute("data-row");
+        let col = 1 * elClicked.getAttribute("data-col");
+        
+        let cell = this.minefield.getCell( row, col );
+        // if the cell is not selected yet
+        if (cell.state == CellState[0]) {
+            // add flag
+            elClicked.classList.remove("not-selected")
+            elClicked.classList.add("flag");
+            cell.state = CellState[1];
+            this.numFlags++;
+        // if the cell has a flag
+        } else if (cell.state == CellState[1]) {
+            // remove flag
+            elClicked.classList.remove("flag");
+            elClicked.classList.add("not-selected");
+            cell.state = CellState[0]
+            this.numFlags--;
+        }   
+    }
+
+    selectCellEvent = (event) => {
+        event.preventDefault();
+        let elClicked = event.target;
+        let row = 1 * elClicked.getAttribute("data-row");
+        let col = 1 * elClicked.getAttribute("data-col");
+        let cell = this.minefield.getCell( row, col );
+        // only interact if cell not selected
+        if (cell.state == CellState[0]) {
+            if (!this.isFirstSelected) this.minefield.randomize(cell);
+            this.isFirstSelected = true;
+            // if mine hit
+            if (cell.isMine) {
+                this.loseGame();
+            }   
+            else {
+                this.minefield.uncoverCells(row, col);
+            }
+        }
+    }
+
     initEventHandlers() {
         // When the user right clicks
         document.querySelector("#mine-table")
-        .addEventListener("contextmenu", event => {
-
-            event.preventDefault();
-            let elClicked = event.target;
-            let row = 1 * elClicked.getAttribute("data-row");
-            let col = 1 * elClicked.getAttribute("data-col");
-            
-            let cell = this.minefield.getCell( row, col );
-            // if the cell is not selected yet
-            if (cell.state == CellState[0]) {
-                // add flag
-                elClicked.classList.remove("not-selected")
-                elClicked.classList.add("flag");
-                cell.state = CellState[1];
-                numFlags++;
-            // if the cell has a flag
-            } else if (cell.state == CellState[1]) {
-                // remove flag
-                elClicked.classList.remove("flag");
-                elClicked.classList.add("not-selected");
-                cell.state = CellState[0]
-                numFlags--;
-            }            
-        });
-
-        // when the user left clicks
-            // check for mines
-            // no mines, start clearing
-            // do we have a loser?
-            // do we have a winner?
+        .addEventListener("contextmenu", this.flagEvent);
 
         document.querySelector("#mine-table")
-        .addEventListener("click", event => {
-            event.preventDefault();
-            let elClicked = event.target;
-            let row = 1 * elClicked.getAttribute("data-row");
-            let col = 1 * elClicked.getAttribute("data-col");
-            let cell = this.minefield.getCell( row, col );
-            // only interact if cell not selected
-            if (cell.state == CellState[0]) {
-                // TODO: 
-                // if a mine, end game
-                // otherwise, 
-                //      uncover the empty space
-                //      find all empty spaces around it
-                //      if the cell has a bomb adjacent to it, display the number of bombs adjacent
-                if (!this.isFirstSelected) this.minefield.randomize(cell);
-                this.isFirstSelected = true;
-                if (cell.isMine) {
-                    console.log("Mine Hit!");
-                }
-                else {
-                    this.minefield.uncoverCells(row, col);
-                }
-                
-            }
-        });
+        .addEventListener("click", this.selectCellEvent);
+    }
+
+    loseGame() {
+        document.querySelector("#mine-table").removeEventListener("click", this.selectCellEvent);
+        document.querySelector("#mine-table").removeEventListener("contextmenu", this.flagEvent);
+        this.minefield.displayAllMines();
+        // TODO: 
     }
 
 
