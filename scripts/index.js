@@ -5,10 +5,11 @@ let CellState = ["NOT_SELECTED", "FLAGGED", "SELECTED"];
 class Cell {
 
     constructor(row, col, isMine = false) {
+        // initialize mine to not selected
         this._state = CellState[0];
         this._isMine = isMine; 
-        this._row = row;
-        this._col = col;
+        this._row = row;            // row of mine
+        this._col = col;            // col of mine
     }
 
     get state() {
@@ -40,7 +41,7 @@ class Minefield {
 
         this.setBoardSize(difficulty)
         
-        this.field = [];
+        this.field = []; // holds all mines in the minefield
         for (let i = 0; i < this._numRows; i++) {
             // create each row inside the minefield
             let row = [];
@@ -188,14 +189,14 @@ class Minefield {
 class App {
 
     constructor(difficulty) {
-        this.minefield = new Minefield(0);      // create minefield
-        this.numFlags = 0;               // Number of mines currently flagged
-        this.difficulty = difficulty;           // The difficulty of the game, regarding size of board and number of mines
-        this.isFirstSelected = false;           // If the player has done their first selected
+        this.minefield = new Minefield(0);                      // create minefield
+        this.numFlagsRemaining = this.minefield.numMines;       // Number of flags remaining
+        this.difficulty = difficulty;                           // The difficulty of the game, regarding size of board and number of mines
+        this.isFirstSelected = false;                           // If the player has done their first selected
 
         // Create the minefield HTML
-        document.querySelector("#mine-table").innerHTML = this.createTableMarkup();
-
+        document.querySelector("#mine-table").innerHTML = this.generateMarkupRows();
+        this.updateFlagsRemaining();
         // Set up event handlers to wait for user input
         this.initEventHandlers()
     }
@@ -216,15 +217,20 @@ class App {
             elClicked.classList.remove("not-selected")
             elClicked.classList.add("flag");
             cell.state = CellState[1];
-            this.numFlags++;
+            this.numFlagsRemaining--;
         // if the cell has a flag
         } else if (cell.state == CellState[1]) {
             // remove flag
             elClicked.classList.remove("flag");
             elClicked.classList.add("not-selected");
             cell.state = CellState[0]
-            this.numFlags--;
+            this.numFlagsRemaining++;
         }   
+        this.updateFlagsRemaining();
+    }
+
+    updateFlagsRemaining() {
+        document.querySelector("#score-text").innerHTML = `<span>${this.numFlagsRemaining}</span>`;
     }
 
     selectCellEvent = (event) => {
@@ -261,12 +267,6 @@ class App {
         document.querySelector("#mine-table").removeEventListener("contextmenu", this.flagEvent);
         this.minefield.displayAllMines();
         // TODO: 
-    }
-
-
-    createTableMarkup() {
-        let markup = this.generateMarkupRows();
-        return markup
     }
 
     // All the Rows
