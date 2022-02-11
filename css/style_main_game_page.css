@@ -72,6 +72,8 @@
 /* Holds all Mine rows */
 #mine-table {
     flex-direction: column;
+    width: fit-content;
+    height: fit-content;
 }
 
 /* A mine row holding mine containers along that row */
@@ -87,6 +89,7 @@
     max-width: 30px;
     min-width: 30px;
     width: 30px;
+    text-align: center;
 }
 
 .bomb {

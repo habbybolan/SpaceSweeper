@@ -45,13 +45,10 @@ class Minefield {
             // create each row inside the minefield
             let row = [];
             for (let j = 0; j < this._numCols; j++) {
-
                 row[j] = new Cell(i, j);
             }
             this.field[i] = row;
         }
-
-        this.randomize(this.field[1][1]);
     }
 
     /*
@@ -66,8 +63,7 @@ class Minefield {
             this._numCols = 10;
             this._numMines = 10;
         // medium difficulty 
-        } else if (difficulty == 1)
-        {
+        } else if (difficulty == 1) {
             this._numRows = 16;
             this._numCols = 16;
             this._numMines = 40;
@@ -79,11 +75,6 @@ class Minefield {
         }
     }
 
-    addMine( row, col ) {
-        // Some way to add a a mine to the field
-        field[row][col] = new Cell(true);
-    }
-
     /*
     * Place mines randomly, not placing it on selectedSell
     * param selectedCell    The first cell selected by player
@@ -93,16 +84,75 @@ class Minefield {
         while (tempNumMines > 0) {
             let randRow = Math.floor(Math.random() * this.numRows);
             let randCol = Math.floor(Math.random() * this.numCols);
-            // dont set first selected cell as a mine
-            if (selectedCell.row == randRow && selectedCell.col == randCol) continue;
-
-            // if already a mine, try again
-            let randCell = this.field[randRow][randCol];
-            if (randCell.isMine) continue;
+            // dont set first selected cell as a mine, an already selected mine, or its adjacent cells
+            if (this.field[randRow][randCol].isMine ||
+                (selectedCell.col == randCol && Math.abs(selectedCell.row - randRow) < 2)  ||
+                (selectedCell.row == randRow && Math.abs(selectedCell.col - randCol) < 2) ||
+                (Math.abs(selectedCell.row - randRow) == 1 && Math.abs(selectedCell.col - randCol) == 1)) continue;
             
-            randCell.isMine = true;
+            this.field[randRow][randCol].isMine = true;
             tempNumMines--;
         }
+    }
+
+    uncoverCells(row, col) {
+        let stack = [];  
+        stack.push(this.field[row][col]);
+        while (stack.length != 0) {
+            let cell = stack.pop();
+            row = cell.row;
+            col = cell.col;
+            // if not a mine, then display number adjacent mines and pop adjacent to stack
+            if (!cell.isMine) {
+                cell.state = CellState[2];
+                document.querySelector(`#cell-${row}${col}`).classList.remove("not-selected");
+                document.querySelector(`#cell-${row}${col}`).classList.remove("empty");
+                document.querySelector(`#cell-${row}${col}`).innerHTML = this.numAdjacentMines(row, col);
+                // if the cell has no adjacent mines, then pop children to stack
+                if (this.numAdjacentMines(row, col) == 0) {
+                    // push adjacent cells if they are not mines and unselected to stack
+                    // Up cell
+                    if (cell.row > 0 && !this.field[row-1][col].isMine && this.field[row-1][col].state == CellState[0]) 
+                        stack.push(this.field[row-1][col]);
+                    // down cell
+                    if (cell.row < this.numRows-1 && !this.field[row+1][col].isMine && this.field[row+1][col].state == CellState[0]) 
+                        stack.push(this.field[row+1][col]);
+                    // left cell
+                    if (cell.col > 0 && !this.field[row][col-1].isMine && this.field[row][col-1].state == CellState[0]) 
+                        stack.push(this.field[row][col-1]);
+                    // right cell
+                    if (cell.col < this.numCols-1 && !this.field[row][col+1].isMine && this.field[row][col+1].state == CellState[0])
+                        stack.push(this.field[row][col+1]);
+                }
+            }
+        }
+    }
+
+    numAdjacentMines(row, col) {
+        let numAdjacentMines = 0;
+        // cells above
+        if (row > 0) {
+            // cell down
+            if (this.field[row-1][col].isMine) numAdjacentMines++;
+            // cell down, left
+            if (col > 0 && this.field[row-1][col-1].isMine) numAdjacentMines++; 
+            // cell down, right
+            if (col < this.numCols - 1 && this.field[row-1][col+1].isMine) numAdjacentMines++;
+        }
+        // cells below
+        if (row < this.numRows - 1) {
+            // cell up
+            if (this.field[row+1][col].isMine) numAdjacentMines++;
+            // cell up, left
+            if (col > 0 && this.field[row+1][col-1].isMine) numAdjacentMines++;
+            // cel up, right
+            if (col < this.numCols-1 && this.field[row+1][col+1].isMine) numAdjacentMines++;
+        }
+        // cell right
+        if (col > 0 && this.field[row][col-1].isMine) numAdjacentMines++;
+        // cell left
+        if (col < this.numCols-1 && this.field[row][col+1].isMine) numAdjacentMines++
+        return numAdjacentMines;
     }
 
     getCell( row, col ) {
@@ -127,9 +177,10 @@ class Minefield {
 class App {
 
     constructor(difficulty) {
-        this.minefield = new Minefield(0);    // create minefield
-        this.numFlaggedMines = 0;                       // Number of mines currently flagged
-        this.difficulty = difficulty;                   // The difficulty of the game, regarding size of board and number of mines
+        this.minefield = new Minefield(0);      // create minefield
+        this.numFlags = 0;               // Number of mines currently flagged
+        this.difficulty = difficulty;           // The difficulty of the game, regarding size of board and number of mines
+        this.isFirstSelected = false;           // If the player has done their first selected
 
         // Create the minefield HTML
         document.querySelector("#mine-table").innerHTML = this.createTableMarkup();
@@ -158,21 +209,14 @@ class App {
                 elClicked.classList.remove("not-selected")
                 elClicked.classList.add("flag");
                 cell.state = CellState[1];
-                // if the cell is a mine, increment number of mines flagged
-                if (cell.isMine) {
-                    this.numFlaggedMines++;
-                    if (this.numFlaggedMines == this.minefield.numMines) {
-                        // TODO: End game
-                    }
-                }
+                numFlags++;
             // if the cell has a flag
             } else if (cell.state == CellState[1]) {
                 // remove flag
                 elClicked.classList.remove("flag");
                 elClicked.classList.add("not-selected");
                 cell.state = CellState[0]
-                // if cell is a mine, the decrement number of mines flagged
-                if (cell.isMine) this.numFlaggedMines--;
+                numFlags--;
             }            
         });
 
@@ -181,14 +225,42 @@ class App {
             // no mines, start clearing
             // do we have a loser?
             // do we have a winner?
+
+        document.querySelector("#mine-table")
+        .addEventListener("click", event => {
+            event.preventDefault();
+            let elClicked = event.target;
+            let row = 1 * elClicked.getAttribute("data-row");
+            let col = 1 * elClicked.getAttribute("data-col");
+            let cell = this.minefield.getCell( row, col );
+            // only interact if cell not selected
+            if (cell.state == CellState[0]) {
+                // TODO: 
+                // if a mine, end game
+                // otherwise, 
+                //      uncover the empty space
+                //      find all empty spaces around it
+                //      if the cell has a bomb adjacent to it, display the number of bombs adjacent
+                if (!this.isFirstSelected) this.minefield.randomize(cell);
+                this.isFirstSelected = true;
+                if (cell.isMine) {
+                    console.log("Mine Hit!");
+                }
+                else {
+                    this.minefield.uncoverCells(row, col);
+                }
+                
+            }
+        });
     }
+
 
     createTableMarkup() {
         let markup = this.generateMarkupRows();
         return markup
     }
 
-    // All the ROWS
+    // All the Rows
     generateMarkupRows() {
 
         let markup = "";
