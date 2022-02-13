@@ -51,6 +51,7 @@ export default class Minefield {
     */
     randomize(selectedCell) {
         let tempNumMines = this.numMines;
+        // loop over until a place for each mine is found
         while (tempNumMines > 0) {
             let randRow = Math.floor(Math.random() * this.numRows);
             let randCol = Math.floor(Math.random() * this.numCols);
@@ -59,7 +60,7 @@ export default class Minefield {
                 (selectedCell.col == randCol && Math.abs(selectedCell.row - randRow) < 2)  ||
                 (selectedCell.row == randRow && Math.abs(selectedCell.col - randCol) < 2) ||
                 (Math.abs(selectedCell.row - randRow) == 1 && Math.abs(selectedCell.col - randCol) == 1)) continue;
-            
+            // set as mine
             this.field[randRow][randCol].isMine = true;
             this.incrementAdjacentMineCount(randRow, randCol);
             tempNumMines--;
@@ -95,40 +96,47 @@ export default class Minefield {
         if (col < this.numCols-1) this.field[row][col+1].incrNumAdjacentMines();
     }
 
+    /*
+    * Uncovers all cells, starting from row, col, that have no mines adjacent or a single one.
+    * Continues to uncover if cell has no mines adjacent
+    * param row     row to start at
+    * param col     col to start at
+    * returns       The number of flags it uncovered and all the cells that were uncovered
+    */
     uncoverCells(row, col) {
-        let stack = [];  
-        stack.push(this.field[row][col]);
+        let stack = [];                     // stack holding all valid, adjacent cells to uncover
+        let numFlagsUncovered = 0;          // number of flags uncovered, to swap to selected state 
+        let numCellsUncovered = 0;          // number of cells that were uncovered
+        stack.push(this.field[row][col]);   // start with first, selected cell
         // pop cell off stack, and push its adjacent tiles to stack if not a mine
         while (stack.length != 0) {
             let cell = stack.pop();
             row = cell.row;
             col = cell.col;
             // if not a mine, then display number adjacent mines and pop adjacent to stack
-            if (!cell.isMine) {
+            if (!cell.isMine && cell.state != CellState[2]) {
+                if (cell.state == CellState[1]) numFlagsUncovered++;
+                numCellsUncovered++;
                 cell.state = CellState[2];
-                // Move this to App.js??
-                //  - 
-                document.querySelector(`#cell-${row}${col}`).classList.remove("not-selected");
-                document.querySelector(`#cell-${row}${col}`).classList.add("empty");
-                document.querySelector(`#cell-${row}${col}`).innerHTML = this.field[row][col].numAdjacentMines;
                 // if the cell has no adjacent mines, then pop children to stack
                 if (this.field[row][col].numAdjacentMines == 0) {
                     // push adjacent cells if they are not mines and unselected to stack
                     // Up cell
-                    if (cell.row > 0 && !this.field[row-1][col].isMine && this.field[row-1][col].state == CellState[0]) 
+                    if (cell.row > 0 && !this.field[row-1][col].isMine && this.field[row-1][col].state != CellState[2]) 
                         stack.push(this.field[row-1][col]);
                     // down cell
-                    if (cell.row < this.numRows-1 && !this.field[row+1][col].isMine && this.field[row+1][col].state == CellState[0]) 
+                    if (cell.row < this.numRows-1 && !this.field[row+1][col].isMine && this.field[row+1][col].state != CellState[2]) 
                         stack.push(this.field[row+1][col]);
                     // left cell
-                    if (cell.col > 0 && !this.field[row][col-1].isMine && this.field[row][col-1].state == CellState[0]) 
+                    if (cell.col > 0 && !this.field[row][col-1].isMine && this.field[row][col-1].state != CellState[2]) 
                         stack.push(this.field[row][col-1]);
                     // right cell
-                    if (cell.col < this.numCols-1 && !this.field[row][col+1].isMine && this.field[row][col+1].state == CellState[0])
+                    if (cell.col < this.numCols-1 && !this.field[row][col+1].isMine && this.field[row][col+1].state != CellState[2])
                         stack.push(this.field[row][col+1]);
                 }
             }
         }
+        return {numFlagsUncovered, numCellsUncovered};
     }
 
     getCell( row, col ) {
