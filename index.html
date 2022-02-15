@@ -19,7 +19,7 @@
         </Header>
         
         <!-- main menu screen Page --> 
-        <Section id="main-menu-page" class="hide screen">
+        <Section id="main-menu-page" class="show screen">
 
             <!-- high scores with sidebar -->
             <div id="left-section-container">
@@ -53,9 +53,9 @@
                     
                     <!-- Difficulty selector -->
                     <select id="difficulty-selection">
-                        <option>Easy</option>
-                        <option>Medium</option>
-                        <option>Hard</option>
+                        <option value="0">Easy</option>
+                        <option value="1">Medium</option>
+                        <option value="2">Hard</option>
                     </select>
 
                 </div>
@@ -68,7 +68,7 @@
         </Section>
         
         <!-- Main Game Page -->
-        <Section id="main-game-page" class="show screen">
+        <Section id="main-game-page" class="hide screen">
 
             <!-- Container for game buttons and info -->
            <div id="game-bar-container">

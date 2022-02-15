@@ -6,25 +6,46 @@ import Cell, { CellState } from "./Cell.js"
 
 export default class App {
 
-    constructor(difficulty = 0) {
+    constructor() {
         this.mySound = new buzz.sound("../sound/hit.mp3");      // Sound played when hitting a mine
-        this.difficulty = difficulty;                           // The difficulty of the game, regarding size of board and number of mines
-
-        this.NewGameEvent();
-        // Set up event handlers to wait for user input
-        this.initEventHandlers()
     }
 
     run() {
-        this.NewGameEvent();
         // Set up event handlers to wait for user input
         this.initEventHandlers()
     }
     
     initEventHandlers() {
 
+        // Create new game and set up Minefield click events
         document.querySelector("#new-game-button")
         .addEventListener('click', this.NewGameEvent);
+
+        // Start a game from the main menu
+        document.querySelector("#play-button")
+        .addEventListener('click', this.PlayGameEvent);
+
+        document.querySelector("#menu-button")
+        .addEventListener('click', this.BackToMenuEvent);
+    }
+
+    /*
+    * Event to start the game from the main menu
+    */
+    PlayGameEvent = () => {
+        document.querySelector('#main-menu-page').classList.remove("show");
+        document.querySelector('#main-menu-page').classList.add("hide");
+        document.querySelector('#main-game-page').classList.add("show");
+        this.NewGameEvent();
+    }
+
+    /*
+    * Event to go back to main menu
+    */
+    BackToMenuEvent = () => {
+        document.querySelector('#main-game-page').classList.remove("show");
+        document.querySelector('#main-game-page').classList.add("hide");
+        document.querySelector('#main-menu-page').classList.add("show");
     }
     
     // Creates a new game and (re-)initializes ability to click minefield cells.
@@ -37,15 +58,23 @@ export default class App {
         document.querySelector("#mine-table")
         .addEventListener("click", this.selectCellEvent);
 
-        this.minefield = new Minefield(this.difficulty);        // create minefield
-        this.numFlagsRemaining = this.minefield.numMines;       // Number of flags remaining                         
-        this.isFirstSelected = false;                           // If the player has done their first selected
-        this.numCellsSelected = 0;                              // Number of cells currently uncovered
-        
-        // Create the minefield HTML
-        document.querySelector("#mine-table").innerHTML = this.generateMarkupRows();
+        this.createNewMinefield();
+    }
+
+    /*
+    * Creates a new Minefield and sets all beginning values.
+    */
+    createNewMinefield() {
+        this.minefield = new Minefield(document.querySelector('#difficulty-selection').value);  // create minefield
+        this.numFlagsRemaining = this.minefield.numMines;                                       // Number of flags remaining                         
+        this.isFirstSelected = false;                                                           // If the player has done their first selected
+        this.numCellsSelected = 0;                                                              // Number of cells currently uncovered
+
         // update the flag counter html
         this.updateFlagsRemaining();
+
+        // Create the minefield HTML
+        document.querySelector("#mine-table").innerHTML = this.generateMarkupRows();
     }
     
     /*
@@ -140,7 +169,7 @@ export default class App {
     }
 
     /*
-    * Sets the state CellState, and removed all other classes associate to the other CellStates if needed.
+    * Update the cell's class and adjacent mines number visually
     */
     resetCellState(element, cell) {
         element.classList.remove("not-selected");
@@ -156,7 +185,9 @@ export default class App {
         }
     }
 
-
+    /*
+    * Goto lose screen.
+    */ 
     loseGame() {
         document.querySelector("#mine-table").removeEventListener("click", this.selectCellEvent);
         document.querySelector("#mine-table").removeEventListener("contextmenu", this.flagEvent);
@@ -165,6 +196,9 @@ export default class App {
         // TODO: goto lose screen 
     }
 
+    /*
+    * Goto win screen
+    */
     winGame() {
         // goto win screen
         document.querySelector("#mine-table").removeEventListener("click", this.selectCellEvent);
