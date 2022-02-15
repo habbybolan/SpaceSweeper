@@ -107,7 +107,7 @@ export default class Minefield {
         let stack = [];                     // stack holding all valid, adjacent cells to uncover
         let numFlagsUncovered = 0;          // number of flags uncovered, to swap to selected state 
         let numCellsUncovered = 0;          // number of cells that were uncovered
-        stack.push(this.field[row][col]);   // start with first, selected cell
+        stack.push(this.field[row][col]);   // start with first selected cell
         // pop cell off stack, and push its adjacent tiles to stack if not a mine
         while (stack.length != 0) {
             let cell = stack.pop();

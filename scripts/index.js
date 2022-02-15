@@ -1,4 +1,4 @@
-// Main start Minesweeper
+// Copyright (C) Nicholas johnson 2022
 
 import App from './App.js'
 

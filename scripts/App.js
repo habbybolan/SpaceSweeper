@@ -8,34 +8,45 @@ export default class App {
 
     constructor() {
         this.mySound = new buzz.sound("../sound/hit.mp3");      // Sound played when hitting a mine
+        this.timeCurrGame = 0;                                  // Seconds of current length of minesweeper game
     }
 
     run() {
-        // Set up event handlers to wait for user input
-        this.initEventHandlers()
+        // Set up event handlers and minefield
+        this.initMenuEventHandlers()
     }
     
-    initEventHandlers() {
-
-        // Create new game and set up Minefield click events
-        document.querySelector("#new-game-button")
-        .addEventListener('click', this.NewGameEvent);
+    /**
+     * Initialize menu event handlers
+     */
+    initMenuEventHandlers() {
 
         // Start a game from the main menu
         document.querySelector("#play-button")
-        .addEventListener('click', this.PlayGameEvent);
-
-        document.querySelector("#menu-button")
-        .addEventListener('click', this.BackToMenuEvent);
+            .addEventListener('click', this.PlayGameEvent);
     }
 
-    /*
-    * Event to start the game from the main menu
-    */
+    /**
+     * Initialize Game event handlers
+     */
+    initializeGameEventHandlers() {
+        
+        document.querySelector("#menu-button")
+            .addEventListener('click', this.BackToMenuEvent);
+        
+        // Create new game and set up Minefield click events
+        document.querySelector("#new-game-button")
+            .addEventListener('click', this.NewGameEvent);
+    }
+
+    /** 
+     * Event to start the game from the main menu
+     */
     PlayGameEvent = () => {
         document.querySelector('#main-menu-page').classList.remove("show");
         document.querySelector('#main-menu-page').classList.add("hide");
         document.querySelector('#main-game-page').classList.add("show");
+        this.initializeGameEventHandlers();
         this.NewGameEvent();
     }
 
@@ -46,6 +57,7 @@ export default class App {
         document.querySelector('#main-game-page').classList.remove("show");
         document.querySelector('#main-game-page').classList.add("hide");
         document.querySelector('#main-menu-page').classList.add("show");
+        this.leaveGame();
     }
     
     // Creates a new game and (re-)initializes ability to click minefield cells.
@@ -53,22 +65,51 @@ export default class App {
 
         // When the user right clicks a cell
         document.querySelector("#mine-table")
-        .addEventListener("contextmenu", this.flagEvent);
+            .addEventListener("contextmenu", this.flagEvent);
+
         // when the user left clicks a cell
         document.querySelector("#mine-table")
-        .addEventListener("click", this.selectCellEvent);
+            .addEventListener("click", this.selectCellEvent);
 
+        this.setupNewGame();
+    }
+
+    /**
+     * start game visuals, starting values, and timers
+     */
+    setupNewGame() {
+        // (Re-)start the timer
+        this.stopLoopingTimer(); 
+        this.timeCurrGame = 0;
+        this.updateGameTimer();
+        this.startLoopingTimer();
+
+        // create the minefield
         this.createNewMinefield();
+        
+    }
+
+    /**
+     * Helper for leaving the game
+     */
+    leaveGame() {
+        this.stopLoopingTimer();
+        document.querySelector("#mine-table")
+            .removeEventListener("click", this.selectCellEvent);
+
+        document.querySelector("#mine-table")
+            .removeEventListener("contextmenu", this.flagEvent);
     }
 
     /*
     * Creates a new Minefield and sets all beginning values.
     */
     createNewMinefield() {
-        this.minefield = new Minefield(document.querySelector('#difficulty-selection').value);  // create minefield
-        this.numFlagsRemaining = this.minefield.numMines;                                       // Number of flags remaining                         
-        this.isFirstSelected = false;                                                           // If the player has done their first selected
-        this.numCellsSelected = 0;                                                              // Number of cells currently uncovered
+        this.minefield = new Minefield(
+            document.querySelector('#difficulty-selection').value); // create minefield
+        this.numFlagsRemaining = this.minefield.numMines;           // Number of flags remaining                         
+        this.isFirstSelected = false;                               // If the player has done their first selected
+        this.numCellsSelected = 0;                                  // Number of cells currently uncovered
 
         // update the flag counter html
         this.updateFlagsRemaining();
@@ -114,6 +155,40 @@ export default class App {
     }
 
     /*
+    * Start the looping timer, updating the game time by seconds
+    */
+    startLoopingTimer = () => {
+        this.minesweeperTimer = setInterval(() => {
+            this.timeCurrGame++;
+            this.updateGameTimer();
+          }, 1000);
+    }
+
+    /*
+    * Update the game timer using the current seconds of game time
+    */
+    updateGameTimer() {
+        let minutes = Math.floor(this.timeCurrGame / 60);
+        let seconds = this.timeCurrGame % 60;
+        document.querySelector("#time-text")
+            .textContent = `${this.formatTime(minutes)}:${this.formatTime(seconds)}`
+    }
+
+    // Helper to Keep a string of time in 00:00 format
+    // param num    The seconds or minutes value to format
+    formatTime(num) {
+        return num <= 9 ? `0${num}` : num;
+    }
+
+    /*
+    * Stop the looping timer.
+    */
+    stopLoopingTimer() {
+        if (this.minesweeperTimer)
+            clearInterval(this.minesweeperTimer);
+    }
+
+    /*
     * Event for left clicking on an unselected cell.
     * Checks if it was a mine or not, and if you lose, won, or game not over yet.
     */
@@ -126,7 +201,8 @@ export default class App {
         let cell = this.minefield.getCell( row, col );
         // only interact if cell not selected
         if (cell.state == CellState[0]) {
-            if (!this.isFirstSelected) this.minefield.randomize(cell);
+            if (!this.isFirstSelected) 
+                this.minefield.randomize(cell);
             this.isFirstSelected = true;
             // if mine hit, lose
             if (cell.isMine) {
@@ -189,8 +265,7 @@ export default class App {
     * Goto lose screen.
     */ 
     loseGame() {
-        document.querySelector("#mine-table").removeEventListener("click", this.selectCellEvent);
-        document.querySelector("#mine-table").removeEventListener("contextmenu", this.flagEvent);
+        this.leaveGame();
         this.displayAllMines();
         console.log("You lose");
         // TODO: goto lose screen 
@@ -200,9 +275,7 @@ export default class App {
     * Goto win screen
     */
     winGame() {
-        // goto win screen
-        document.querySelector("#mine-table").removeEventListener("click", this.selectCellEvent);
-        document.querySelector("#mine-table").removeEventListener("contextmenu", this.flagEvent);
+        this.leaveGame();
         console.log("You win");
     }
 
@@ -222,7 +295,6 @@ export default class App {
 
     // All the Rows
     generateMarkupRows() {
-
         let markup = "";
         for (let i = 0; i < this.minefield.numRows; i++) {
 
