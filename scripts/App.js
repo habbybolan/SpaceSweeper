@@ -24,6 +24,19 @@ export default class App {
         // Start a game from the main menu
         document.querySelector("#play-button")
             .addEventListener('click', this.PlayGameEvent);
+
+        document.querySelector("#play-button")
+            .addEventListener('mouseenter', event => {
+                let elClicked = event.target;
+                elClicked.classList.remove("play-button-static");
+                elClicked.classList.add("play-button-animated");
+            })
+
+        document.querySelector("#play-button")
+            .addEventListener('mouseleave', event => {
+                let elClicked = event.target;
+                elClicked.classList.add("play-button-static");
+            })
     }
 
     /**
@@ -82,7 +95,6 @@ export default class App {
         this.stopLoopingTimer(); 
         this.timeCurrGame = 0;
         this.updateGameTimer();
-        this.startLoopingTimer();
 
         // create the minefield
         this.createNewMinefield();
@@ -199,15 +211,22 @@ export default class App {
         let row = 1 * elClicked.getAttribute("data-row");
         let col = 1 * elClicked.getAttribute("data-col");
         let cell = this.minefield.getCell( row, col );
+
         // only interact if cell not selected
         if (cell.state == CellState[0]) {
-            if (!this.isFirstSelected) 
+
+            // randomize mines if first click and start the timer
+            if (!this.isFirstSelected) {
                 this.minefield.randomize(cell);
+                this.startLoopingTimer();
+            }
             this.isFirstSelected = true;
+
             // if mine hit, lose
             if (cell.isMine) {
-                this.loseGame();
+                this.loseGame(row, col);
             }   
+            
             // otherwise, non-mine left clicked
             else {
                 // uncover all cells adjacent that are not mines
@@ -218,7 +237,7 @@ export default class App {
                 this.updateMinefield();
                 // update the remaining flags if flagged cells were swapped to selected
                 this.updateFlagsRemaining();
-                // if the number of selected cells equals number of non-mines, win
+                // if the number of selected cells equals number of non-mines, player wins
                 if ((this.minefield.numCols * this.minefield.numRows) - this.minefield.numMines == this.numCellsSelected) {
                     this.winGame();
                 }
@@ -261,28 +280,32 @@ export default class App {
         }
     }
 
-    /*
-    * Goto lose screen.
-    */ 
-    loseGame() {
+    /**
+     * Lose the game, displaying all mines and going to lose screen.
+     * @param {int} row     Row of mine selected
+     * @param {int} col     col of mine selected
+     */
+    loseGame(row, col) {
         this.leaveGame();
         this.displayAllMines();
         console.log("You lose");
         // TODO: goto lose screen 
     }
 
-    /*
-    * Goto win screen
-    */
+    /**
+     * Goto win screen.
+     */
     winGame() {
         this.leaveGame();
         console.log("You win");
     }
 
-    /* Display all mines on the board.
-    * Called after losing the game.
-    */
-    displayAllMines() {
+    /**
+     * Display all mines on the board.
+     * @param {int} row   Row of mine selected
+     * @param {int} col   Col of mine selected
+     */
+    displayAllMines(row, col) {
         for (let i = 0; i < this.minefield.numRows; i++) {
             for (let j = 0; j < this.minefield.numCols; j++) {
                 if (this.minefield.field[i][j].isMine) {

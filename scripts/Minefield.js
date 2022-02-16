@@ -97,7 +97,7 @@ export default class Minefield {
     }
 
     /*
-    * Uncovers all cells, starting from row, col, that have no mines adjacent or a single one.
+    * Uncovers all cells, starting from row, col, that have no mines adjacent or a single one using DFS.
     * Continues to uncover if cell has no mines adjacent
     * param row     row to start at
     * param col     col to start at
@@ -108,19 +108,23 @@ export default class Minefield {
         let numFlagsUncovered = 0;          // number of flags uncovered, to swap to selected state 
         let numCellsUncovered = 0;          // number of cells that were uncovered
         stack.push(this.field[row][col]);   // start with first selected cell
+
         // pop cell off stack, and push its adjacent tiles to stack if not a mine
         while (stack.length != 0) {
             let cell = stack.pop();
             row = cell.row;
             col = cell.col;
+
             // if not a mine, then display number adjacent mines and pop adjacent to stack
             if (!cell.isMine && cell.state != CellState[2]) {
+
+                // keep track of number of flags and cells uncovered
                 if (cell.state == CellState[1]) numFlagsUncovered++;
                 numCellsUncovered++;
                 cell.state = CellState[2];
-                // if the cell has no adjacent mines, then pop children to stack
+
+                // if the cell has no adjacent mines, then push children to stack if not mines and unselected
                 if (this.field[row][col].numAdjacentMines == 0) {
-                    // push adjacent cells if they are not mines and unselected to stack
                     // Up cell
                     if (cell.row > 0 && !this.field[row-1][col].isMine && this.field[row-1][col].state != CellState[2]) 
                         stack.push(this.field[row-1][col]);
@@ -136,6 +140,7 @@ export default class Minefield {
                 }
             }
         }
+        // flags and overall cells uncovered
         return {numFlagsUncovered, numCellsUncovered};
     }
 

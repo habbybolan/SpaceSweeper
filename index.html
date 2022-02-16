@@ -13,11 +13,6 @@
     </head>
     <body>
         
-        <!-- Header for each minesweeper screen-->
-        <Header>
-            Header
-        </Header>
-        
         <!-- main menu screen Page --> 
         <Section id="main-menu-page" class="show screen">
 
@@ -26,14 +21,6 @@
                 <div id="high-score-text">Highscores</div>
                 <ol id="high-score-list">
                     <!-- *** Temp input -->
-                    <li>10000</li>
-                    <li>10000</li>
-                    <li>10000</li>
-                    <li>10000</li>
-                    <li>10000</li>
-                    <li>10000</li>
-                    <li>10000</li>
-                    <li>10000</li>
                     <li>10000</li>
                     <li>10000</li>
                     <li>10000</li>
@@ -48,8 +35,11 @@
 
                     <div id="minesweeper-title-text">MineSweeper</div>
 
-                    <!-- *** <a> temporary -->
-                    <a href="#main-game-page"><button id="play-button">Play!</button></a>
+                    <div id="play-button-container">
+                        <button id="play-button" type="submit" class="play-button-static"></button>
+                    </div>
+
+                    
                     
                     <!-- Difficulty selector -->
                     <select id="difficulty-selection">
