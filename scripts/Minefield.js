@@ -119,24 +119,23 @@ export default class Minefield {
             if (!cell.isMine && cell.state != CellState[2]) {
 
                 // keep track of number of flags and cells uncovered
-                if (cell.state == CellState[1]) numFlagsUncovered++;
+                if (cell.state == CellState[1]) 
+                    numFlagsUncovered++;
                 numCellsUncovered++;
                 cell.state = CellState[2];
 
                 // if the cell has no adjacent mines, then push children to stack if not mines and unselected
                 if (this.field[row][col].numAdjacentMines == 0) {
-                    // Up cell
-                    if (cell.row > 0 && !this.field[row-1][col].isMine && this.field[row-1][col].state != CellState[2]) 
-                        stack.push(this.field[row-1][col]);
-                    // down cell
-                    if (cell.row < this.numRows-1 && !this.field[row+1][col].isMine && this.field[row+1][col].state != CellState[2]) 
-                        stack.push(this.field[row+1][col]);
-                    // left cell
-                    if (cell.col > 0 && !this.field[row][col-1].isMine && this.field[row][col-1].state != CellState[2]) 
-                        stack.push(this.field[row][col-1]);
-                    // right cell
-                    if (cell.col < this.numCols-1 && !this.field[row][col+1].isMine && this.field[row][col+1].state != CellState[2])
-                        stack.push(this.field[row][col+1]);
+                    // loop through all adjacent cell possibilities
+                    for (let i = -1; i <= 1; i++) {
+                        for (let j = -1; j <= 1; j++) {
+                            // push to stack if valid cell to uncover
+                            if (this.field[row+i] && this.field[row+i][col+j]) {
+                                if (!this.field[row+i][col+j].isMine && this.field[row+i][col+j].state != CellState[2])
+                                    stack.push(this.field[row+i][col+j]);
+                            }
+                        }
+                    }
                 }
             }
         }
