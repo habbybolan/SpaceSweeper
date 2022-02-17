@@ -10,8 +10,10 @@
 
 #main-game-page {
     flex-direction: column;
-    --bottom-border-color: rgb(126, 126, 207);
-    --top-border-color: rgb(53, 53, 87);
+    --bottom-border-color: rgb(126, 126, 207, .5);
+    --top-border-color: rgb(53, 53, 87, .5);
+    --default-background-color: rgb(156, 200, 214, .5);
+    --selected-background-color: transparent;
     max-height: 100%;
 }
 
@@ -34,12 +36,25 @@
     font-size: 3em;
 }
 
-.game-button {
-    height: 35px;
+#menu-button-container {
+    height: 100%;
+    width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #menu-button {
-    margin-left: 10px
+    height: 60px;
+    width: 100px;
+}
+
+.menu-button-animated {
+    background-image: url("../images/arrow.gif");
+}
+
+.menu-button-static {
+    background-image: url("../images/arrow.png");
 }
 
 #time-text {}
@@ -47,7 +62,9 @@
 #score-text {}
 
 #new-game-button {
-    margin-right: 10px;
+    background-color: aliceblue;
+    width: 100px;
+    height: 100%;
 }
 
 /* Minesweeper game */
@@ -82,15 +99,21 @@
 }
 
 .bomb {
-    background-image: url("../images/mine.jpg");
+    background-image: url("../images/bomb.png");
+    background-color: var(--default-background-color);
+}
+
+.bomb-selected {
+    background-image: url("../images/bomb.png");
+    background-color:red;
 }
 
 .flag {
-    background-image: url("../images/red_flag.png");
+    background-image: url("../images/flag.png");
 }
 
 .empty {
-    background-color: darkgrey;
+    background-color: var(--selected-background-color);
     border: 0;
 }
 
@@ -101,6 +124,6 @@
     border-right: solid 2px var(--bottom-border-color);
     border-left: solid 2px var(--top-border-color);
     border-top: solid 2px var(--top-border-color);
-    background-color: lightblue;
+    background-color: var(--default-background-color);
 }
 

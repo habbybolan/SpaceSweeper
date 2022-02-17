@@ -63,12 +63,7 @@
 }
 
 #play-button {
-    padding: 0;
-    border: 0;
-    margin: 0;
-    background-color: transparent;
-    background-repeat: no-repeat;
-    background-size: 100%;
+    
 }
 
 #middle-content-container {
@@ -91,14 +86,16 @@
 }
 
 #instruction-button {
-    width: 100px;
+    width: 150px;
     height: 50px;
     margin-top: 20px;
     margin-right: 20px;
+    z-index: 3;
+    font-family: 'pixel';
+    background-color: rgb(74, 74, 187);
 }
 
 #floating-instructions-container {
-    display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;  
@@ -106,10 +103,27 @@
     position: fixed;
 }
 
-#test {
+#floating-instructions {
     width: 100vh;
-    height: 80vh;
+    height: fit-content;
     margin: auto;
-    background-color: blue;
+    background-color: rgb(74, 74, 187);
     position: fixed;
+    padding: 5px;
+}
+
+.instructions-image {
+    display: inline-block;
+    height: 15px;
+    width: 30px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    padding: auto;
+    text-align: center;
+}
+
+.instruction-line-container {
+    width: 100%;
+    height: fit-content;
+    vertical-align: middle;
 }

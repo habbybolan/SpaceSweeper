@@ -9,6 +9,7 @@ export default class App {
     constructor() {
         this.mySound = new buzz.sound("../sound/hit.mp3");      // Sound played when hitting a mine
         this.timeCurrGame = 0;                                  // Seconds of current length of minesweeper game
+        this.bShowingInstructions = false;                       // If instructions on main menu being shown
     }
 
     run() {
@@ -27,15 +28,33 @@ export default class App {
 
         document.querySelector("#play-button")
             .addEventListener('mouseenter', event => {
-                let elClicked = event.target;
-                elClicked.classList.remove("play-button-static");
-                elClicked.classList.add("play-button-animated");
+                let elHovered = event.target;
+                elHovered.classList.remove("play-button-static");
+                elHovered.classList.add("play-button-animated");
             })
 
         document.querySelector("#play-button")
             .addEventListener('mouseleave', event => {
-                let elClicked = event.target;
-                elClicked.classList.add("play-button-static");
+                let elUnhovered = event.target;
+                elUnhovered.classList.add("play-button-static");
+            })
+        
+        // display/i
+        document.querySelector("#instruction-button")
+            .addEventListener('click', event => {
+                let elClicked = document.querySelector("#floating-instructions-container");
+                // if showing instructions, close it
+                if (this.bShowingInstructions) {
+                    elClicked.classList.remove("show");
+                    elClicked.classList.add("hide");
+                    this.bShowingInstructions = false;
+                }
+                // otherwise, open instructions
+                else {
+                    elClicked.classList.remove("hide");
+                    elClicked.classList.add("show");
+                    this.bShowingInstructions = true;
+                }
             })
     }
 
@@ -44,6 +63,20 @@ export default class App {
      */
     initializeGameEventHandlers() {
         
+        document.querySelector("#menu-button")
+            .addEventListener('mouseenter', event => {
+                let elHovered = event.target;
+                elHovered.classList.remove("menu-button-static")
+                elHovered.classList.add("menu-button-animated")
+            });
+
+        document.querySelector("#menu-button")
+            .addEventListener('mouseleave', event => {
+                let elUnHover = event.target;
+                elUnHover.classList.remove("menu-button-animated")
+                elUnHover.classList.add("menu-button-static")
+        });
+
         document.querySelector("#menu-button")
             .addEventListener('click', this.BackToMenuEvent);
         
@@ -287,7 +320,7 @@ export default class App {
      */
     loseGame(row, col) {
         this.leaveGame();
-        this.displayAllMines();
+        this.displayAllMines(row, col);
         console.log("You lose");
         // TODO: goto lose screen 
     }
@@ -308,7 +341,11 @@ export default class App {
     displayAllMines(row, col) {
         for (let i = 0; i < this.minefield.numRows; i++) {
             for (let j = 0; j < this.minefield.numCols; j++) {
-                if (this.minefield.field[i][j].isMine) {
+                if (i == row && j == col) {
+                    document.querySelector(`#cell-${i}-${j}`).classList.remove("not-selected");
+                    document.querySelector(`#cell-${i}-${j}`).classList.add("bomb-selected");
+                }
+                else if (this.minefield.field[i][j].isMine) {
                     document.querySelector(`#cell-${i}-${j}`).classList.remove("not-selected");
                     document.querySelector(`#cell-${i}-${j}`).classList.add("bomb");
                 }
