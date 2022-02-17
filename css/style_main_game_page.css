@@ -20,12 +20,8 @@
 #game-bar-container {
     display: flex;
     flex: 1;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: center;
-    border-bottom: solid 6px var(--bottom-border-color);
-    border-right: solid 6px var(--bottom-border-color);
-    border-left: solid 6px var(--top-border-color);
-    border-top: solid 6px var(--top-border-color);
 }
 
 .game-bar-item {
@@ -47,13 +43,6 @@
 }
 
 #time-text {}
-
-#image-status {
-    background-image: url("../images/smiley.png");
-    max-width: 75px;
-    height: 75px;
-    background-size: cover;
-}
 
 #score-text {}
 

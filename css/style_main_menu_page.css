@@ -78,13 +78,38 @@
     margin-bottom: 300px;
 }
 
+#difficulty-selection {
+    margin-top: 10px;
+}
+
 /* Game difficulty */
 
 #right-section-container {
     display: flex;
     flex: 1;
+    justify-content: right;
 }
 
-#difficulty-selection {
-    margin-top: 10px;
+#instruction-button {
+    width: 100px;
+    height: 50px;
+    margin-top: 20px;
+    margin-right: 20px;
+}
+
+#floating-instructions-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;  
+    height: 100%;
+    position: fixed;
+}
+
+#test {
+    width: 100vh;
+    height: 80vh;
+    margin: auto;
+    background-color: blue;
+    position: fixed;
 }
