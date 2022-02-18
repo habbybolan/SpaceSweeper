@@ -63,6 +63,8 @@
 
 #difficulty-selection {
     margin-top: 10px;
+    background-color: rgb(109, 8, 109);
+    border: 0;
 }
 
 /* Game difficulty */

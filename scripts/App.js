@@ -381,8 +381,16 @@ export default class App {
         return 0;
     }
 
+    /**
+     * Calculates a score of the winning game.
+     * @returns The score of the current winning game
+     */
     calculateScore() {
-        return this.timeCurrGame * this.minefield.numMines;
+        // score time multiplier stops after 1000 seconds
+        return this.timeCurrGame > 1000 ? 
+            this.minefield.numMines : 
+            // otherwise, the faster the completion, the higher the score
+            (1000 - this.timeCurrGame) * this.minefield.numMines;
     }
 
     showWinLoseScreen() {

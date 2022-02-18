@@ -56,7 +56,7 @@ button {
 }
 
 .play-button-static {
-    height: 60px;
-    width: 90px;
+    height: 70px;
+    width: 100px;
     background-image: url("../images/play_button_red.png");
 }
