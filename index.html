@@ -74,12 +74,22 @@
                         <button id="play-button" type="submit" class="button play-button-static"></button>
                     </div>
                     
-                    <!-- Difficulty selector -->
-                    <select id="difficulty-selection">
-                        <option value="0">Easy</option>
-                        <option value="1">Medium</option>
-                        <option value="2">Hard</option>
-                    </select>
+                    <div class="container-horizontal">
+                        <!-- Difficulty buttons -->
+                        <button id="easy-difficulty-button" class="difficulty-button">Easy</button>
+                        <button id="medium-difficulty-button" class="difficulty-button">Medium</button>
+                        <button id="hard-difficulty-button" class="difficulty-button">Hard</button>
+                    </div>
+
+                    <div class="container-horizontal">
+                        <form>
+                            <input type="number" value=10 id="numRows" name="numRows">
+                            <input type="number" value=10 id="numCols" name="numCols">
+                            <input type="number" value=10 id="numMines" name="numMines">
+                        </form>
+                    </div>
+
+                    <div id="error-difficulty-input"></div>
 
                 </div>
                 

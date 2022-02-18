@@ -6,9 +6,11 @@ import { CellState } from "./Cell.js"
 
 export default class Minefield {
 
-    constructor( difficulty ) {
+    constructor( numRows, numCols, numMines ) {
 
-        this.setBoardSize(difficulty)
+        this._numRows = 1 * numRows;
+        this._numCols = 1 * numCols;
+        this._numMines = 1 * numMines;
         
         this.field = []; // holds all mines in the minefield
         for (let i = 0; i < this._numRows; i++) {
@@ -22,30 +24,6 @@ export default class Minefield {
     }
 
     /*
-    * Called from constructor to set the board size and number of mines based in difficulty 
-    * param difficulty  The difficulty of the game
-    */
-    setBoardSize(difficulty)
-    {
-        // easy difficulty
-        if (difficulty == 0) {
-            this._numRows = 10;
-            this._numCols = 10;
-            this._numMines = 10;
-        // medium difficulty 
-        } else if (difficulty == 1) {
-            this._numRows = 16;
-            this._numCols = 16;
-            this._numMines = 40;
-        // hardest difficulty
-        } else {
-            this._numRows = 16;
-            this._numCols = 30;
-            this._numMines = 99;
-        }
-    }
-
-    /*
     * Place mines randomly, not placing it on selectedSell
     * param selectedCell    The first cell selected by player
     */
@@ -55,16 +33,49 @@ export default class Minefield {
         while (tempNumMines > 0) {
             let randRow = Math.floor(Math.random() * this.numRows);
             let randCol = Math.floor(Math.random() * this.numCols);
-            // dont set first selected cell as a mine, an already selected mine, or its adjacent cells
-            if (this.field[randRow][randCol].isMine ||
-                (selectedCell.col == randCol && Math.abs(selectedCell.row - randRow) < 2)  ||
-                (selectedCell.row == randRow && Math.abs(selectedCell.col - randCol) < 2) ||
-                (Math.abs(selectedCell.row - randRow) == 1 && Math.abs(selectedCell.col - randCol) == 1)) continue;
-            // set as mine
-            this.field[randRow][randCol].isMine = true;
-            this.incrementAdjacentMineCount(randRow, randCol);
-            tempNumMines--;
+            
+            // increment the randRow and randCol until a valid mine cell is found
+            while (true) {
+                // dont set first selected cell as a mine, an already selected mine, or its adjacent cells
+                // if valid cell location
+                if (this.isValidMineLocation(randRow, randCol, selectedCell)) {
+                        this.field[randRow][randCol].isMine = true;
+                        this.incrementAdjacentMineCount(randRow, randCol);
+                        tempNumMines--;
+                        break;
+                } else {
+                    // If not at the end of the row, goto next cell
+                    if (randCol < this._numCols - 1)  {
+                        randCol++;
+                    }
+                    // if at end of row but not end of minefield, goto next row
+                    else if (randRow < this._numRows - 1) {
+                        randCol = 0;
+                        randRow++;
+                    }
+                    // Otherwise loop back to beginning at 0,0
+                    else {
+                        randCol = 0;
+                        randRow = 0;
+                    }
+                }
+            }
         }
+    }
+
+    /**
+     * Check if the row, col is a valid mine location
+     * dont set first selected cell as a mine, an already selected mine, or its adjacent cells
+     * @param {int} randRow         Row to check if valid mine location
+     * @param {int} randCol         col to check if valid mine location
+     * @param {int} selectedCell    The cell the user selected
+     * @returns                     True if row, col is a valid mine location
+     */
+    isValidMineLocation(randRow, randCol, selectedCell) {
+        return (!this.field[randRow][randCol].isMine &&
+        !(selectedCell.col == randCol && Math.abs(selectedCell.row - randRow) < 2)  &&
+        !(selectedCell.row == randRow && Math.abs(selectedCell.col - randCol) < 2) &&
+        !(Math.abs(selectedCell.row - randRow) == 1 && Math.abs(selectedCell.col - randCol) == 1));
     }
 
     /* Increment all cells 's mine count around the mine places

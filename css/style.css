@@ -47,6 +47,7 @@ button {
     background-color: transparent;
     background-repeat: no-repeat;
     background-size: 100%;
+    font-family: 'pixel';
 }
 
 .play-button-animated {
@@ -59,4 +60,17 @@ button {
     height: 70px;
     width: 100px;
     background-image: url("../images/play_button_red.png");
+}
+
+.container-horizontal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container-vertical {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }

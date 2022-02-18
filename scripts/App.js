@@ -17,6 +17,10 @@ export default class App {
         // Set up event handlers and minefield
         this.initMenuEventHandlers()
     }
+
+    isValidMinefieldInput() {
+        return true;
+    }
     
     /**
      * Initialize menu event handlers
@@ -26,8 +30,14 @@ export default class App {
         // Start a game from the main menu
         document.querySelector("#play-button")
             .addEventListener('click', event => {
-                this.hideMainMenuPage();
-                this.PlayGameEvent();
+                // if valid input for a minefield begin
+                if (this.isValidMinefieldInput()) {
+                    this.hideMainMenuPage();
+                    this.PlayGameEvent();
+                // otherwise, error text
+                } else {
+                    document.querySelector("#error-difficulty-input").textContent = "invalid input";
+                }
             });
 
         document.querySelector("#play-button")
@@ -53,6 +63,30 @@ export default class App {
                     this.bShowingInstructions = true;
                 }
             })
+
+        // easy difficulty
+        document.querySelector("#easy-difficulty-button")
+            .addEventListener('click', event => {
+                document.querySelector("#numRows").value = 9;
+                document.querySelector("#numCols").value = 9;
+                document.querySelector("#numMines").value = 10;
+            });
+        
+        // medium difficulty
+        document.querySelector("#medium-difficulty-button")
+            .addEventListener('click', event => {
+                document.querySelector("#numRows").value = 16;
+                document.querySelector("#numCols").value = 16;
+                document.querySelector("#numMines").value = 40;
+            });
+
+        // hard difficulty
+        document.querySelector("#hard-difficulty-button")
+            .addEventListener('click', event => {
+                document.querySelector("#numRows").value = 16;
+                document.querySelector("#numCols").value = 30;
+                document.querySelector("#numMines").value = 99;
+            });
     }
 
     HoverOverPlayGameEvent = event => {
@@ -183,7 +217,9 @@ export default class App {
     */
     createNewMinefield() {
         this.minefield = new Minefield(
-            document.querySelector('#difficulty-selection').value); // create minefield
+            document.querySelector('#numRows').value,
+            document.querySelector('#numCols').value,
+            document.querySelector('#numMines').value);              // create minefield
         this.numFlagsRemaining = this.minefield.numMines;           // Number of flags remaining                         
         this.isFirstSelected = false;                               // If the player has done their first selected
         this.numCellsSelected = 0;                                  // Number of cells currently uncovered
