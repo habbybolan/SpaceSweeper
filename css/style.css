@@ -48,3 +48,15 @@ button {
     background-repeat: no-repeat;
     background-size: 100%;
 }
+
+.play-button-animated {
+    height: 70px;
+    width: 100px;
+    background-image: url("../images/play_button_red.gif");
+}
+
+.play-button-static {
+    height: 60px;
+    width: 90px;
+    background-image: url("../images/play_button_red.png");
+}

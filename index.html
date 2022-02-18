@@ -6,7 +6,6 @@
         <link rel="stylesheet" type="text/css" href="css/style.css">
         <link rel="stylesheet" type="text/css" href="css/style_main_game_page.css">
         <link rel="stylesheet" type="text/css" href="css/style_main_menu_page.css">
-        <link rel="stylesheet" type="text/css" href="css/style_win_lose_page.css">
         
         <script src="https://cdnjs.cloudflare.com/ajax/libs/buzz/1.2.1/buzz.min.js"></script>
         
@@ -43,15 +42,15 @@
                     </div>
                     <br>
                     <div class="instruction-line-container">
-                        &emsp; - Right click to place a flag on uncovered squares that may be mines so you cannot left click them.
+                        &emsp; - Right click to place a flag on uncovered squares that may be mines.
                     </div>
                     <br>
                     <div class="instruction-line-container">
-                        &emsp; - Uncover all the non-mine squares to win, 
+                        &emsp; - Uncover all the non-mine squares to win.
                     </div>
                     <br>
                     <div class="instruction-line-container">
-                        &emsp; - lose once you uncover a mine. 
+                        &emsp; - lose if you uncover a mine 
                         <span class="instructions-image" style='background-image: url(/images/bomb.png)'></span>
                     </div>
                 </div>
@@ -61,11 +60,6 @@
             <div id="left-section-container">
                 <div id="high-score-text">Highscores</div>
                 <ol id="high-score-list">
-                    <!-- *** Temp input -->
-                    <li>10000</li>
-                    <li>10000</li>
-                    <li>10000</li>
-                    <li>10000</li>
                 </ol>
             </div>
 
@@ -79,8 +73,6 @@
                     <div id="play-button-container">
                         <button id="play-button" type="submit" class="button play-button-static"></button>
                     </div>
-
-                    
                     
                     <!-- Difficulty selector -->
                     <select id="difficulty-selection">
@@ -105,37 +97,32 @@
             <!-- Container for game buttons and info -->
            <div id="game-bar-container">
                <!-- Button to navigate to main menu -->
-                <div id="menu-button-container">
-                    <button id="menu-button" class="game-bar-item menu-button-static"></button>
-                </div>
+                <button id="menu-button" class="game-bar-item menu-button-static"></button>
                 <!-- Time of game so far -->
                 <div id="time-text" class="game-bar-item game-bar-text">00:00</div>
                 <!-- Score of the current game -->
-                <div id="score-text" class="game-bar-item game-bar-text">2000</div>
+                <div id="flag-text" class="game-bar-item game-bar-text">2000</div>
                 <!-- Button to start a new game -->
-                <button id="new-game-button" class="game-bar-item">New Game</button>
+                <button id="play-again-button" class="play-button-static game-bar-item"></button>
            </div>
 
             <!-- container for main game -->
             <div id="main-game-container" class="game-container">
+
+                <!-- Win/Lose Section -->
+                <Section id="win-lose-section" class="hide screen">
+                    <div id="win-lose-text">You (Win/Lose)</div>
+                    <div id="score-text">0</div>
+                </Section>
+
+                <!-- main game table -->
                 <div id="mine-table" class="game-container">
                 </div>
                 
             </div>
         </Section>
         
-        <!-- Win/Lose Page -->
-        <Section id="win-lose-page" class="hide screen">
-            <!-- Section floating over game page, displaying win/lose text and nav buttons  -->
-            <div id="floating-middle-container">
-                <div id="win-lose-text">You (Win/Lose)</div>
-                <!-- Nav buttons -->
-                <nav id="buttons-container">
-                    <a href="#main-game-page"><button id="play-again-button">Play Again</button></a>
-                    <a href="#main-menu-page"><button id="main-menu-button">Main Menu</button></a>
-                </nav>
-            </div>
-        </Section>
+        
 
         <!-- Footer for each minesweeper screen -->
         <footer>

@@ -36,13 +36,6 @@
     font-size: 3em;
 }
 
-#menu-button-container {
-    height: 100%;
-    width: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
 #menu-button {
     height: 60px;
@@ -59,17 +52,51 @@
 
 #time-text {}
 
-#score-text {}
+
 
 #new-game-button {
-    background-color: aliceblue;
+    background-image: url("../images/new_game.png");
     width: 100px;
-    height: 100%;
+    height: 70px;
+    font-family: 'pixel';
+    font-size: 1em;
 }
 
 /* Minesweeper game */
 
+#win-lose-text {
+    font-size: 7em;
+}
+
+#score-text {
+    font-size: 4em;
+    background-color: transparent;
+}
+
+#play-again-button {
+    height: 10vh;
+    width: 15vh;
+}
+
+#win-lose-section {
+    position: fixed;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    animation: fadeInAnimation ease 3s;
+}
+
+@keyframes fadeInAnimation {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 #main-game-container {
+    flex-direction: column;
     flex: 10;
     margin-top: 10px;
     max-height: 100%;
@@ -95,7 +122,7 @@
     max-width: 30px;
     min-width: 30px;
     width: 30px;
-    text-align: center;
+    text-align:center;
 }
 
 .bomb {

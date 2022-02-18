@@ -9,7 +9,8 @@ export default class App {
     constructor() {
         this.mySound = new buzz.sound("../sound/hit.mp3");      // Sound played when hitting a mine
         this.timeCurrGame = 0;                                  // Seconds of current length of minesweeper game
-        this.bShowingInstructions = false;                       // If instructions on main menu being shown
+        this.bShowingInstructions = false;                      // If instructions on main menu being shown
+        this.scoreList = [];                                    // List of scores on the current session
     }
 
     run() {
@@ -24,20 +25,16 @@ export default class App {
 
         // Start a game from the main menu
         document.querySelector("#play-button")
-            .addEventListener('click', this.PlayGameEvent);
+            .addEventListener('click', event => {
+                this.hideMainMenuPage();
+                this.PlayGameEvent();
+            });
 
         document.querySelector("#play-button")
-            .addEventListener('mouseenter', event => {
-                let elHovered = event.target;
-                elHovered.classList.remove("play-button-static");
-                elHovered.classList.add("play-button-animated");
-            })
+            .addEventListener('mouseenter', this.HoverOverPlayGameEvent)
 
         document.querySelector("#play-button")
-            .addEventListener('mouseleave', event => {
-                let elUnhovered = event.target;
-                elUnhovered.classList.add("play-button-static");
-            })
+            .addEventListener('mouseleave', this.UnHoverPlayGameEvent)
         
         // display/i
         document.querySelector("#instruction-button")
@@ -57,6 +54,18 @@ export default class App {
                 }
             })
     }
+
+    HoverOverPlayGameEvent = event => {
+        let elHovered = event.target;
+        elHovered.classList.remove("play-button-static");
+        elHovered.classList.add("play-button-animated");
+    }
+
+    UnHoverPlayGameEvent = event => {
+        let elUnhovered = event.target;
+        elUnhovered.classList.add("play-button-static");
+    }
+
 
     /**
      * Initialize Game event handlers
@@ -80,35 +89,58 @@ export default class App {
         document.querySelector("#menu-button")
             .addEventListener('click', this.BackToMenuEvent);
         
+        
+        let playagainBtn = document.querySelector("#play-again-button");
         // Create new game and set up Minefield click events
-        document.querySelector("#new-game-button")
-            .addEventListener('click', this.NewGameEvent);
+        playagainBtn.addEventListener('click', this.NewGameEvent);
+        // initiate animation for play button
+        playagainBtn.addEventListener('mouseenter', this.HoverOverPlayGameEvent)
+        playagainBtn.addEventListener('mouseleave', this.UnHoverPlayGameEvent)
     }
 
     /** 
      * Event to start the game from the main menu
      */
     PlayGameEvent = () => {
-        document.querySelector('#main-menu-page').classList.remove("show");
-        document.querySelector('#main-menu-page').classList.add("hide");
         document.querySelector('#main-game-page').classList.add("show");
         this.initializeGameEventHandlers();
         this.NewGameEvent();
+    }
+
+    hideMainMenuPage() {
+        let mainMenuPage =  document.querySelector('#main-menu-page');
+        mainMenuPage.classList.remove("show");
+        mainMenuPage.classList.add("hide");
     }
 
     /*
     * Event to go back to main menu
     */
     BackToMenuEvent = () => {
-        document.querySelector('#main-game-page').classList.remove("show");
-        document.querySelector('#main-game-page').classList.add("hide");
+        
+        // add each score to the highscore list
+        let highscoreMarkup = "";
+        for (let i = 0; i < this.scoreList.length; i++) {
+            highscoreMarkup += `<li>${this.scoreList[i]}</li>`
+        }
+        document.querySelector("#high-score-list").innerHTML = highscoreMarkup;
+
+        // hide and leave main game, goto main menu
+        this.hideMainGame();
         document.querySelector('#main-menu-page').classList.add("show");
         this.leaveGame();
+    }
+
+    hideMainGame() {
+        let mainGamePage = document.querySelector('#main-game-page');
+        mainGamePage.classList.remove("show");
+        mainGamePage.classList.add("hide");
     }
     
     // Creates a new game and (re-)initializes ability to click minefield cells.
     NewGameEvent = () => {
 
+        this.hideWinLoseSection();
         // When the user right clicks a cell
         document.querySelector("#mine-table")
             .addEventListener("contextmenu", this.flagEvent);
@@ -196,7 +228,7 @@ export default class App {
     * Updates the remaining number of flags on screen.
     */
     updateFlagsRemaining() {
-        document.querySelector("#score-text").innerHTML = `<span>${this.numFlagsRemaining}</span>`;
+        document.querySelector("#flag-text").innerHTML = `<span>${this.numFlagsRemaining}</span>`;
     }
 
     /*
@@ -319,18 +351,51 @@ export default class App {
      * @param {int} col     col of mine selected
      */
     loseGame(row, col) {
-        this.leaveGame();
         this.displayAllMines(row, col);
-        console.log("You lose");
-        // TODO: goto lose screen 
+        // show lose text
+        document.querySelector("#win-lose-text").textContent = "You lose";
+        document.querySelector("#score-text").textContent = "";
+        this.showWinLoseScreen();
     }
 
     /**
      * Goto win screen.
      */
     winGame() {
+        // get score of current game and store in list of scores
+        let newScore = this.calculateScore();
+        this.scoreList.push(newScore);
+        this.scoreList.sort(this.compareLargestFirst);
+        // show win text
+        document.querySelector("#win-lose-text").textContent = "You win";
+        // show score
+        document.querySelector("#score-text").textContent = newScore;
+        this.showWinLoseScreen();
+    }
+
+    compareLargestFirst(a, b) {
+        if (a < b)
+            return 1;
+        if (a > b)
+            return -1;
+        return 0;
+    }
+
+    calculateScore() {
+        return this.timeCurrGame * this.minefield.numMines;
+    }
+
+    showWinLoseScreen() {
         this.leaveGame();
-        console.log("You win");
+        let winLoseScreen = document.querySelector("#win-lose-section");
+        winLoseScreen.classList.remove("hide");
+        winLoseScreen.classList.add("show");
+    }
+
+    hideWinLoseSection() {
+        let playagainPage = document.querySelector("#win-lose-section");
+        playagainPage.classList.remove("show");
+        playagainPage.classList.add("hide");
     }
 
     /**
