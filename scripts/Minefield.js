@@ -65,7 +65,7 @@ export default class Minefield {
 
     /**
      * Check if the row, col is a valid mine location
-     * dont set first selected cell as a mine, an already selected mine, or its adjacent cells
+     * dont set first selected cell as a mine, an already selected mine, or its adjacent cells (always start with a 0)
      * @param {int} randRow         Row to check if valid mine location
      * @param {int} randCol         col to check if valid mine location
      * @param {int} selectedCell    The cell the user selected
@@ -78,10 +78,11 @@ export default class Minefield {
         !(Math.abs(selectedCell.row - randRow) == 1 && Math.abs(selectedCell.col - randCol) == 1));
     }
 
-    /* Increment all cells 's mine count around the mine places
-    * param row     Row the mine was placed at
-    * param col     Col the mine was placed at
-    */ 
+    /**
+     * Increment all cells 's mine count around the mine places
+     * @param {int} row     Row the mine was placed at
+     * @param {int} col     Column the mine was placed at
+     */
     incrementAdjacentMineCount(row, col) {
         // cells above
         if (row > 0) {
@@ -107,13 +108,13 @@ export default class Minefield {
         if (col < this.numCols-1) this.field[row][col+1].incrNumAdjacentMines();
     }
 
-    /*
-    * Uncovers all cells, starting from row, col, that have no mines adjacent or a single one using DFS.
-    * Continues to uncover if cell has no mines adjacent
-    * param row     row to start at
-    * param col     col to start at
-    * returns       The number of flags it uncovered and all the cells that were uncovered
-    */
+    /**
+     * Uncovers all cells, starting from row, col, that have no mines adjacent or a single one using DFS.
+     * Continues to uncover if cell has no mines adjacent
+     * @param {int} row     row to start at
+     * @param {int} col     column to start at
+     * @returns             The number of flags it uncovered and all the cells that were uncovered
+     */
     uncoverCells(row, col) {
         let stack = [];                     // stack holding all valid, adjacent cells to uncover
         let numFlagsUncovered = 0;          // number of flags uncovered, to swap to selected state 
@@ -152,6 +153,31 @@ export default class Minefield {
         }
         // flags and overall cells uncovered
         return {numFlagsUncovered, numCellsUncovered};
+    }
+
+    /**
+     * Calculates a score of the winning game.
+     * @returns The score of the current winning game
+     */
+     calculateScore(time) {
+        // score time multiplier stops after 1000 seconds
+        return time > 1000 ? 
+            this._numMines : 
+            // otherwise, the faster the completion, the higher the score
+            (1000 - time) * this._numMines;
+    }
+
+    /**
+     * Static method to determine if the user input for number of rows, cols, and mines is valid
+     * @param {int} numRows     Number of rows input by user
+     * @param {int} numCols     Number of columns input by user
+     * @param {int} numMines    Number of mines input by user
+     * @returns                 True if all inputs are valid
+     */
+    static isValidMinefieldInput(numRows, numCols, numMines) {
+        if (numRows <= 0 || numCols <= 0 || numMines <= 0) return false;
+        if (numMines > numRows * numCols - 9) return false;
+        return true;
     }
 
     getCell( row, col ) {

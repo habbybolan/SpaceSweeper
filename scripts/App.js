@@ -17,10 +17,6 @@ export default class App {
         // Set up event handlers and minefield
         this.initMenuEventHandlers()
     }
-
-    isValidMinefieldInput() {
-        return true;
-    }
     
     /**
      * Initialize menu event handlers
@@ -30,8 +26,17 @@ export default class App {
         // Start a game from the main menu
         document.querySelector("#play-button")
             .addEventListener('click', event => {
+
+                // Get user input values for size of minefield and number of mines
+                let numRows = document.querySelector("#numRows").value;
+                let numCols = document.querySelector("#numCols").value;
+                let numMines = document.querySelector("#numMines").value;
+                
                 // if valid input for a minefield begin
-                if (this.isValidMinefieldInput()) {
+                if (Minefield.isValidMinefieldInput(numRows, numCols, numMines)) {
+                    // remove any error text showing
+                    document.querySelector("#error-difficulty-input").textContent = "";
+                    // goto game
                     this.hideMainMenuPage();
                     this.PlayGameEvent();
                 // otherwise, error text
@@ -40,9 +45,11 @@ export default class App {
                 }
             });
 
+        // play button Hover event
         document.querySelector("#play-button")
             .addEventListener('mouseenter', this.HoverOverPlayGameEvent)
 
+        // play button unhover event
         document.querySelector("#play-button")
             .addEventListener('mouseleave', this.UnHoverPlayGameEvent)
         
@@ -89,12 +96,20 @@ export default class App {
             });
     }
 
+    /**
+     * Event to start play button animated gif on hover
+     * @param {int} event   Play button event
+     */
     HoverOverPlayGameEvent = event => {
         let elHovered = event.target;
         elHovered.classList.remove("play-button-static");
         elHovered.classList.add("play-button-animated");
     }
 
+    /**
+     * Event to start stop play button animated gift on unhover
+     * @param {int} event   Play button event
+     */
     UnHoverPlayGameEvent = event => {
         let elUnhovered = event.target;
         elUnhovered.classList.add("play-button-static");
@@ -162,7 +177,7 @@ export default class App {
         // hide and leave main game, goto main menu
         this.hideMainGame();
         document.querySelector('#main-menu-page').classList.add("show");
-        this.leaveGame();
+        this.endGame();
     }
 
     hideMainGame() {
@@ -201,9 +216,9 @@ export default class App {
     }
 
     /**
-     * Helper for leaving the game
+     * Helper for Ending the current minesweeper game
      */
-    leaveGame() {
+    endGame() {
         this.stopLoopingTimer();
         document.querySelector("#mine-table")
             .removeEventListener("click", this.selectCellEvent);
@@ -399,7 +414,7 @@ export default class App {
      */
     winGame() {
         // get score of current game and store in list of scores
-        let newScore = this.calculateScore();
+        let newScore = this.minefield.calculateScore(this.timeCurrGame);
         this.scoreList.push(newScore);
         this.scoreList.sort(this.compareLargestFirst);
         // show win text
@@ -409,6 +424,12 @@ export default class App {
         this.showWinLoseScreen();
     }
 
+    /**
+     * Comparator for sorting a high-score list largest values first
+     * @param {int} a   First value to compare
+     * @param {int} b   Second value to compare
+     * @returns         1 if 'a' smaller, -1 if 'b' smaller, 0 otherwise
+     */
     compareLargestFirst(a, b) {
         if (a < b)
             return 1;
@@ -417,25 +438,15 @@ export default class App {
         return 0;
     }
 
-    /**
-     * Calculates a score of the winning game.
-     * @returns The score of the current winning game
-     */
-    calculateScore() {
-        // score time multiplier stops after 1000 seconds
-        return this.timeCurrGame > 1000 ? 
-            this.minefield.numMines : 
-            // otherwise, the faster the completion, the higher the score
-            (1000 - this.timeCurrGame) * this.minefield.numMines;
-    }
-
+    // Show the win/lose text and end the game
     showWinLoseScreen() {
-        this.leaveGame();
+        this.endGame();
         let winLoseScreen = document.querySelector("#win-lose-section");
         winLoseScreen.classList.remove("hide");
         winLoseScreen.classList.add("show");
     }
 
+    // Hide the win/lose text
     hideWinLoseSection() {
         let playagainPage = document.querySelector("#win-lose-section");
         playagainPage.classList.remove("show");

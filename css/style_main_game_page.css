@@ -62,14 +62,13 @@
 
 #win-lose-text {
     font-size: 7em;
+    color: purple;
 }
 
 #score-text {
     font-size: 4em;
     background-color: transparent;
-}
-
-#play-again-button {
+    color: purple;
 }
 
 #win-lose-section {
