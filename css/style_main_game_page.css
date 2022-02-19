@@ -38,7 +38,6 @@
     font-size: 3em;
 }
 
-
 #menu-button {
     height: 60px;
     width: 100px;
@@ -56,19 +55,17 @@
     background-image: url("../images/arrow.png");
 }
 
-#time-text {}
-
 /* Minesweeper game */
 
 #win-lose-text {
     font-size: 7em;
-    color: purple;
+    color: rgb(206, 65, 206);
 }
 
 #score-text {
     font-size: 4em;
     background-color: transparent;
-    color: purple;
+    color: rgb(206, 65, 206);
 }
 
 #win-lose-section {
@@ -91,8 +88,8 @@
 #main-game-container {
     flex-direction: column;
     flex: 10;
-    margin-top: 10px;
-    max-height: 100%;
+    min-height: 100%;
+    min-width: 100%;
 }
 
 /* Holds all Mine rows */
@@ -100,7 +97,10 @@
     flex-direction: column;
     width: fit-content;
     height: fit-content;
+    max-height: 100%;
+    max-width: 100%;
     user-select: none;
+    overflow: auto;
 }
 
 /* A mine row holding mine containers along that row */
