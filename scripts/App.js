@@ -13,6 +13,7 @@ export default class App {
         this.newGameSound = new buzz.sound("../sound/lazer.ogg");           // Sound when clicking play button
         this.flagSound = new buzz.sound("../sound/flag.wav");               // sound when setting a flag
         this.difficultySound = new buzz.sound("../sound/difficulty.wav");   // sound when setting difficulty from buttons
+        this.winSound = new buzz.sound("../sound/win.wav");                 // Sound when player wins game
         this.timeCurrGame = 0;                                              // Seconds of current length of minesweeper game
         this.bShowingInstructions = false;                                  // If instructions on main menu being shown
         this.scoreList = [];                                                // List of scores on the current session
@@ -441,6 +442,7 @@ export default class App {
      * Goto win screen.
      */
     winGame() {
+        this.winSound.play();
         // get score of current game and store in list of scores
         let newScore = this.minefield.calculateScore(this.timeCurrGame);
         this.scoreList.push(newScore);
