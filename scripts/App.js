@@ -7,15 +7,20 @@ import Cell, { CellState } from "./Cell.js"
 export default class App {
 
     constructor() {
-        this.mySound = new buzz.sound("../sound/hit.mp3");      // Sound played when hitting a mine
-        this.timeCurrGame = 0;                                  // Seconds of current length of minesweeper game
-        this.bShowingInstructions = false;                      // If instructions on main menu being shown
-        this.scoreList = [];                                    // List of scores on the current session
+        this.hitSound = new buzz.sound("../sound/hit.wav");                 // Sound for uncovering an empty square
+        this.instructionSound = new buzz.sound("../sound/instruction.ogg"); // Sound for uncovering an empty square
+        this.mineSound = new buzz.sound("./sound/mine.mp3");                // Sound for uncovering a mine
+        this.newGameSound = new buzz.sound("../sound/lazer.ogg");           // Sound when clicking play button
+        this.flagSound = new buzz.sound("../sound/flag.wav");               // sound when setting a flag
+        this.difficultySound = new buzz.sound("../sound/difficulty.wav");   // sound when setting difficulty from buttons
+        this.timeCurrGame = 0;                                              // Seconds of current length of minesweeper game
+        this.bShowingInstructions = false;                                  // If instructions on main menu being shown
+        this.scoreList = [];                                                // List of scores on the current session
     }
 
     run() {
         // Set up event handlers and minefield
-        this.initMenuEventHandlers()
+        this.initMenuEventHandlers();
     }
     
     /**
@@ -53,27 +58,38 @@ export default class App {
         document.querySelector("#play-button")
             .addEventListener('mouseleave', this.UnHoverPlayGameEvent)
         
-        // display/i
+        // display instructions
         document.querySelector("#instruction-button")
             .addEventListener('click', event => {
-                let elClicked = document.querySelector("#floating-instructions-container");
+                let elInstructions = document.querySelector("#floating-instructions-container");
                 // if showing instructions, close it
                 if (this.bShowingInstructions) {
-                    elClicked.classList.remove("show");
-                    elClicked.classList.add("hide");
+                    elInstructions.classList.remove("show");
+                    elInstructions.classList.add("hide");
                     this.bShowingInstructions = false;
                 }
                 // otherwise, open instructions
                 else {
-                    elClicked.classList.remove("hide");
-                    elClicked.classList.add("show");
+                    this.instructionSound.play();
+                    elInstructions.classList.remove("hide");
+                    elInstructions.classList.add("show");
                     this.bShowingInstructions = true;
                 }
+            })
+
+        // hide instructions if showing
+        document.querySelector("#floating-instructions-container")
+            .addEventListener('click', event => {
+                let elToHide = document.querySelector("#floating-instructions-container");
+                elToHide.classList.remove("show");
+                elToHide.classList.add("hide");     
+                this.bShowingInstructions = false;       
             })
 
         // easy difficulty
         document.querySelector("#easy-difficulty-button")
             .addEventListener('click', event => {
+                this.difficultySound.play();
                 document.querySelector("#numRows").value = 9;
                 document.querySelector("#numCols").value = 9;
                 document.querySelector("#numMines").value = 10;
@@ -82,6 +98,7 @@ export default class App {
         // medium difficulty
         document.querySelector("#medium-difficulty-button")
             .addEventListener('click', event => {
+                this.difficultySound.play();
                 document.querySelector("#numRows").value = 16;
                 document.querySelector("#numCols").value = 16;
                 document.querySelector("#numMines").value = 40;
@@ -90,6 +107,7 @@ export default class App {
         // hard difficulty
         document.querySelector("#hard-difficulty-button")
             .addEventListener('click', event => {
+                this.difficultySound.play();
                 document.querySelector("#numRows").value = 16;
                 document.querySelector("#numCols").value = 30;
                 document.querySelector("#numMines").value = 99;
@@ -180,6 +198,9 @@ export default class App {
         this.endGame();
     }
 
+    /**
+     * Hide the main minesweeper game page
+     */
     hideMainGame() {
         let mainGamePage = document.querySelector('#main-game-page');
         mainGamePage.classList.remove("show");
@@ -205,6 +226,7 @@ export default class App {
      * start game visuals, starting values, and timers
      */
     setupNewGame() {
+        this.newGameSound.play();
         // (Re-)start the timer
         this.stopLoopingTimer(); 
         this.timeCurrGame = 0;
@@ -212,7 +234,6 @@ export default class App {
 
         // create the minefield
         this.createNewMinefield();
-        
     }
 
     /**
@@ -257,15 +278,17 @@ export default class App {
         let col = 1 * elClicked.getAttribute("data-col");
         
         let cell = this.minefield.getCell( row, col );
-        // if the cell is not selected yet
+        // if the cell is not selected yet, place flag
         if (cell.state == CellState[0]) {
+            this.flagSound.play();
             // add flag
             elClicked.classList.remove("not-selected")
             elClicked.classList.add("flag");
             cell.state = CellState[1];
             this.numFlagsRemaining--;
-        // if the cell has a flag
+        // if the cell has a flag, remove flag
         } else if (cell.state == CellState[1]) {
+            this.flagSound.play();
             // remove flag
             elClicked.classList.remove("flag");
             elClicked.classList.add("not-selected");
@@ -293,17 +316,21 @@ export default class App {
     }
 
     /*
-    * Update the game timer using the current seconds of game time
+    * Update the game timer using the current seconds of game time in format '00:00'
     */
     updateGameTimer() {
         let minutes = Math.floor(this.timeCurrGame / 60);
         let seconds = this.timeCurrGame % 60;
+        // set time to format '00:00'
         document.querySelector("#time-text")
             .textContent = `${this.formatTime(minutes)}:${this.formatTime(seconds)}`
     }
 
-    // Helper to Keep a string of time in 00:00 format
-    // param num    The seconds or minutes value to format
+    /**
+     * Helper method to keep a string of game time in format 00:00
+     * @param {int} num The seconds/minutes values to format
+     * @returns         The second/minute in format '00'
+     */
     formatTime(num) {
         return num <= 9 ? `0${num}` : num;
     }
@@ -318,11 +345,11 @@ export default class App {
 
     /*
     * Event for left clicking on an unselected cell.
-    * Checks if it was a mine or not, and if you lose, won, or game not over yet.
+    * Checks if it was a mine or not.
+    * Checks if player lost, won, or game is still going.
     */
     selectCellEvent = (event) => {
         event.preventDefault();
-        this.mySound.play();
         let elClicked = event.target;
         let row = 1 * elClicked.getAttribute("data-row");
         let col = 1 * elClicked.getAttribute("data-col");
@@ -340,11 +367,12 @@ export default class App {
 
             // if mine hit, lose
             if (cell.isMine) {
+                this.mineSound.play();
                 this.loseGame(row, col);
             }   
-            
             // otherwise, non-mine left clicked
             else {
+                this.hitSound.play();
                 // uncover all cells adjacent that are not mines
                 let uncoverObj = this.minefield.uncoverCells(row, col);
                 this.numFlagsRemaining += uncoverObj.numFlagsUncovered;
@@ -362,7 +390,7 @@ export default class App {
     }
 
     /*
-    * Performs a full visual update on the minefield give the cell's current states
+    * Performs a full visual update on the minefield given the stored cell's current states
     */
     updateMinefield() {
         for (let i = 0; i < this.minefield.numRows; i++) {
@@ -380,7 +408,7 @@ export default class App {
     }
 
     /*
-    * Update the cell's class and adjacent mines number visually
+    * Update the cell's class and adjacent mines' number visually
     */
     resetCellState(element, cell) {
         element.classList.remove("not-selected");
@@ -473,7 +501,10 @@ export default class App {
         }
     }
 
-    // All the Rows
+    /**
+     * Creates the markup structure of the minefield table
+     * @returns     The HTML markup string for the minefield table
+     */
     generateMarkupRows() {
         let markup = "";
         for (let i = 0; i < this.minefield.numRows; i++) {

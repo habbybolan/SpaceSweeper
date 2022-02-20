@@ -23,10 +23,10 @@ export default class Minefield {
         }
     }
 
-    /*
-    * Place mines randomly, not placing it on selectedSell
-    * param selectedCell    The first cell selected by player
-    */
+    /**
+     * Place mines randomly on board, avoiding the selected cells and adjacent/diagonal cells to selected cell
+     * @param {Cell} selectedCell The first cell of the game selected by the player
+     */
     randomize(selectedCell) {
         let tempNumMines = this.numMines;
         // loop over until a place for each mine is found

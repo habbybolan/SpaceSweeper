@@ -1,5 +1,4 @@
 /* Copyright (C) Nicholas Johnson 2022 */
-#main-menu-page { }
 
 /* High Scrores */
 #left-section-container {
@@ -84,7 +83,7 @@
 }
 
 #floating-instructions {
-    width: 100vh;
+    width: 100vw;
     height: fit-content;
     margin: auto;
     background-color: rgb(74, 74, 187);
@@ -121,4 +120,7 @@
 }
 input {
     width: 60px;
+    background-color: purple;
+    border: 0;
+    margin: 5px;
 }
